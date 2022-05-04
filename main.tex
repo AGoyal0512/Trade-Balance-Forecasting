@@ -27,24 +27,56 @@
 
 \section{Introduction}
 
-The economic variable that we chose to forecast is the U.S. International Trade Balance in Goods and Services. International Trade Balance in Goods and Services attempts to accurately measure the trade balance of the United States, which is the difference between imports and exports measured in the millions of US dollars (\$). 
+The economic variable that we chose to forecast is the U.S. International Trade Balance in Goods and Services. International Trade Balance in Goods and Services attempts to accurately measure the trade balance of the United States, which is the difference between imports and exports measured in the millions of US dollars (\$).\\
 
 This economic time series also captures what the top exports and imports in the United States were in a given month. However, for the purpose of the forecast, we will be looking at the value of the Trade Balance for the coming 12 months. To provide a more complete picture of the forecasts, we look at both point and interval forecasts.
 
-\section{Data}
+\section{Data and Metrics}
 
-The original publisher of the data we use is the Bureau of Economic Analysis (BEA). However, we obtained the data from the Federal Reserve Economic Data (FRED)\cite{data} using the FRED code \texttt{BOPGSTB}.
+The original publisher of the data we use is the Bureau of Economic Analysis (BEA). However, we obtained the data from the Federal Reserve Economic Data (FRED)\cite{data} using the FRED code \texttt{BOPGSTB}.\\
 
-\section{Methods}
+For the purpose of comparing different models we use for our data, the metric we use is the Akaike Information Criterion (AIC) to choose the best forecasting model. Since we are just beginning to work out a model for the Trade Balance time series, we believe that all models we come up with are just approximations of the true model, and our goal here is to find the best approximation, rather than finding the true model\cite{aic}. Moreover, we do not have access to out-of-sample data. These are the reasons for us to choose the AIC criterion over others like the Bayesian Information Criterion (BIC).
 
-\section{Models}
+\section{Methods and Models}
+
+To begin exploring the nature of the time series data, we look at the auto-correlation function and the partial auto-correlation function and plot correlograms for the same. We see that the auto-correlation correlogram shows a slow decay trend and the partial auto-correlation correlogram seems to show no fixed trend (see \texttt{Appendix A}), except for indicating 7 significant lags after which the subsequent lags become insignificant. These trends suggest that we should look at an Autoregressive (AR) model for our forecast\cite{ar}.\\
+
+Since the partial auto-correlation correlogram shows us that the first 7 lags would be important to look at for our AR model, we went ahead and ran the \texttt{ARIMA(7, 0, 0)} model on the time series data. On doing so, we saw that only the \texttt{p-values} for the first 4 lags were significant, and the AIC for this model was \texttt{6838.614} (See \texttt{Appendix B}). Updating the forecast model to just an autoregressive model of order 4 or \texttt{ARIMA(4, 0, 0)}, we got that all the four lags are significant, and more importantly, our AIC value was also lower at \texttt{6835.714}, which was the motivating factor for us to move forward with this model.\\
+
+Before proceeding, we wanted to check for stationarity in our model, and see if we need any fixes to make the series stationary if it is non-stationary. For this, we used the Augmented Dickey-Fuller (ADF) test\cite{stationarity}. In this test, our null-hypothesis was that of assuming non-stationarity in the time series, while the alternative was the opposite, assuming stationary. We decided to use a \texttt{0.05} size-of-test for this hypothesis test.\\
+
+When we ran the ADF test on our original time series, we got a \texttt{p-value} of \texttt{0.922304}, which means that we clearly fail to reject the null hypothesis for non-stationarity, which implies that there is a good chance that our series possesses non-stationarity, and that our series has a unit root. To fix this, we decided to use the method of differencing, and took a one-differenced time series of our original data, and then re-ran the ADF test on this series (See \texttt{Appendix C}). This time we obtained a \texttt{p-value} of almost \texttt{0.000}, which indicates that we have a strong evidence to reject the null hypothesis and conclude that this new series is stationary. So we now decided to integrate the one-differenced component in our ARIMA model, to get the \texttt{ARIMA(4, 1, 0)}. The lower AIC value of \texttt{6807.724} confirmed that we were thinking in the right direction.
+
+Laslty, we saw that on running the \texttt{ARIMA(4, 1, 0)} model, the $4^\text{th}$ lag became insignificant with a \texttt{p-value} of greater than \texttt{0.05}. So we decided to drop that lag and settle on an \texttt{ARIMA(3, 1, 0)} model, which had roughly a similar AIC value, but a lower BIC value, which was an indication that this model might be closer to what the true forecasting model for this time series looks like (See \texttt{Appendix B}).
+
+
 
 \section{Forecasts and Discussions}
 
+TO-DO
+
+
 \begin{center}
-        \printbibliography %Prints bibliography
+        \printbibliography
 \end{center}
 
-\appendixname{ A}
+\bigskip\bigskip\bigskip
+
+\begin{center}
+        \Large\appendixname{ A}
+\end{center}
+
+\bigskip\bigskip
+
+\begin{center}
+        \Large\appendixname{ B}
+\end{center}
+
+\bigskip\bigskip
+
+\begin{center}
+        \Large\appendixname{ C}
+\end{center}
+
 
 \end{document}
